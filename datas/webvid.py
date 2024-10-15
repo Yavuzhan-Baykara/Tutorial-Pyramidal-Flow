@@ -35,22 +35,29 @@ def main(args):
         video_url = video_info['contentUrl']
         video_id = video_info['videoid']
         save_path = os.path.join(args.output_dir, f"{video_id}.mp4")
-        
+
         # Video indirme işlemi
         download_video(video_url, save_path)
 
         # Her video için kayıt bilgisi oluştur
-        video_records.append({
+        video_data = {
             'video_id': video_id,
             'video_url': video_url,
             'saved_path': save_path
-        })
+        }
+
+        # Dataset'teki tüm diğer sütunları video_data'ya ekle
+        for key, value in video_info.items():
+            video_data[key] = value
+
+        # Kaydı listeye ekle
+        video_records.append(video_data)
 
         # Her 100 videoda bir çıktı yazdır
         if i % 100 == 0:
             print(f"{i} video indirildi...")
 
-    # İndirilen videoları CSV dosyasına kaydetme
+    # İndirilen videoları CSV dosyasına kaydetme (tüm sütunlar dahil)
     df = pd.DataFrame(video_records)
     df.to_csv(args.output_csv, index=False)
 
